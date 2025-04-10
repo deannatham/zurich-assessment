@@ -12,7 +12,8 @@ To setup the project locally:
 2. Clone the repository
 3. `cd` into the project directory and run `docker-compose up --build` in the terminal
 4. Go to [localhost:3000/api](http://localhost:3000/api/) to access the application's endpoints on Swagger
-5. To tear down and stop the containers run `docker-compose down -v`
+5. Apply the user role `admin` or `viewer` in the request header fields according to the assessment's requirements to the specific endpoints
+6. To tear down and stop the containers run `docker-compose down -v`
 
 To run the project using the application's docker image and without cloning the repository:
 
@@ -58,4 +59,5 @@ networks:
 
 3. In the directory of the docker-compose file just created, run `docker-compose up --build` in the terminal
 4. Go to [localhost:3000/api](http://localhost:3000/api/) to access the application's endpoints on Swagger
-5. To tear down and stop the containers run `docker-compose down -v`
+5. Apply the user role `admin` or `viewer` in the request header fields according to the assessment's requirements to the specific endpoints
+6. To tear down and stop the containers run `docker-compose down -v`
