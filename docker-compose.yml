@@ -3,7 +3,7 @@ services:
     image: postgres:12-alpine
     environment:
       POSTGRES_PASSWORD: root
-      POSTGRES_USERNAME: root
+      POSTGRES_USER: root
       POSTGRES_DB: customer_billing_portal
     networks:
       - app
@@ -18,7 +18,7 @@ services:
     ports:
       - '8080:8080'
 
-  recipe-dev:
+  billing-dev:
     build:
       context: .
       dockerfile: Dockerfile
