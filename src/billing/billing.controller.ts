@@ -82,7 +82,6 @@ export class BillingController {
     @Body()
     input: CreateBillingDto,
   ) {
-    console.log(input.premiumPaid);
     return await this.billingService.createBilling(input);
   }
 

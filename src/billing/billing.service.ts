@@ -33,7 +33,6 @@ export class BillingService {
     input: UpdateBillingDto,
     productCode: number,
   ): Promise<void> {
-    console.log(productCode);
     await this.billingRepository.update(
       { id: input.id, productCode },
       { location: input.location, premiumPaid: input.premiumPaid },
