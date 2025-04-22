@@ -23,7 +23,7 @@ export class UpdateBillingDto {
   })
   @IsString()
   @IsOptional()
-  email: string;
+  email?: string;
 
   @ApiProperty({
     description: "Customer's location",

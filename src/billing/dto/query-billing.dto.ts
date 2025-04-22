@@ -11,7 +11,7 @@ export class QueryBillingDto {
   @IsPositive()
   @IsOptional()
   @Type(() => Number)
-  productCode: number;
+  productCode?: number;
 
   @ApiPropertyOptional({
     description: 'Location for filtering billing records',
@@ -19,5 +19,19 @@ export class QueryBillingDto {
   })
   @IsString()
   @IsOptional()
-  location: string;
+  location?: string;
+
+  @ApiPropertyOptional({ example: 1, description: 'Page number' })
+  @IsNumber()
+  @IsPositive()
+  @Type(() => Number)
+  @IsOptional()
+  page?: number;
+
+  @ApiPropertyOptional({ example: 5, description: 'Result limit' })
+  @IsNumber()
+  @IsPositive()
+  @Type(() => Number)
+  @IsOptional()
+  limit?: number;
 }

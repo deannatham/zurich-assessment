@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Billing } from './billing/entity/billing';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RoleCheckMiddleware } from './middleware/role-check.middleware';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RoleCheckMiddleware } from './middleware/role-check.middleware';
         logging: configService.get<boolean>('DB_LOGGING'),
       }),
     }),
+    AuthModule,
   ],
   controllers: [],
   providers: [],

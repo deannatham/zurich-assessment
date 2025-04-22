@@ -13,8 +13,15 @@ export class BillingService {
     @InjectRepository(Billing) private billingRepository: Repository<Billing>,
   ) {}
 
-  async getBilling(input: QueryBillingDto): Promise<Billing[]> {
-    const billing = await this.billingRepository.find({
+  async getBilling(input: QueryBillingDto): Promise<{
+    data: Billing[];
+    meta: { total: number; page: number; limit: number; totalPages: number };
+  }> {
+    const { page = 1, limit = 10 } = input;
+
+    const [billing, total] = await this.billingRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
       where: { productCode: input.productCode, location: input.location },
     });
 
@@ -22,27 +29,47 @@ export class BillingService {
       throw new NotFoundException('Premium paid not found');
     }
 
-    return billing;
+    return {
+      data: billing,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
-  async createBilling(billing: CreateBillingDto): Promise<void> {
-    await this.billingRepository.save(billing);
+  async createBilling(billing: CreateBillingDto): Promise<{ id: string }> {
+    const entity = await this.billingRepository.save(billing);
+    return { id: entity.id };
   }
 
   async updateBilling(
     input: UpdateBillingDto,
     productCode: number,
-  ): Promise<void> {
-    await this.billingRepository.update(
+  ): Promise<{ id: string }> {
+    const result = await this.billingRepository.update(
       { id: input.id, productCode },
       { location: input.location, premiumPaid: input.premiumPaid },
     );
+
+    if (result.affected === 0) {
+      throw new NotFoundException('No billing record found to update');
+    }
+    return { id: input.id };
   }
 
-  async deleteBilling(input: DeleteBillingDto) {
-    await this.billingRepository.delete({
+  async deleteBilling(input: DeleteBillingDto): Promise<{ id: string }> {
+    const result = await this.billingRepository.delete({
       id: input.id,
       productCode: input.productCode,
     });
+
+    if (result.affected === 0) {
+      throw new NotFoundException('No billing record found to delete');
+    }
+
+    return { id: input.id };
   }
 }

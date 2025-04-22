@@ -14,7 +14,7 @@ export class Billing {
   @Column()
   lastName: string;
 
-  @Column({ type: 'integer' }) // if enum can use 'varchar' as type
+  @Column({ type: 'integer' })
   productCode: number;
 
   @Column()

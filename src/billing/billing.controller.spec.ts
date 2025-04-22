@@ -1,34 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BillingController } from './billing.controller';
 import { BillingService } from './billing.service';
+import { QueryBillingDto } from './dto/query-billing.dto';
+import { CreateBillingDto } from './dto/create-billing.dto';
+import { UpdateBillingDto } from './dto/update-billing.dto';
+import { DeleteBillingDto } from './dto/delete-billing.dto';
+import { NotFoundException } from '@nestjs/common';
 
 describe('BillingController', () => {
   let controller: BillingController;
 
-  // TODO #1: this is just as an example to use mock services
-  /*
   const mockBillingService = {
-    // all methods go here under here i.e.
-    findAll: async () => [{ id: 'id'}],
-    findOne: async () => ({ id: 'id'})
-  }*/
-
-  // TODO #2: this is an example if you want to mock a method in the service
-  /*const mockFindOne = jest.fn();
-
-  // then replace the method in the mockBillingService in TODO #1 to:
-  const mockBillingService = {
-    findOne: mockFindOne,
-  };*/
+    getBilling: jest.fn(),
+    createBilling: jest.fn(),
+    updateBilling: jest.fn(),
+    deleteBilling: jest.fn(),
+  };
 
   beforeEach(async () => {
-    // TODO #2: reset the mock in each test
-    // jest.resetAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BillingController],
-      providers: [BillingService],
-      // instead of above, replace with below:
-      // providers: [{ provide: BillingService, useValue: mockBillingService }]
+      providers: [{ provide: BillingService, useValue: mockBillingService }],
     }).compile();
 
     controller = module.get<BillingController>(BillingController);
@@ -38,58 +30,128 @@ describe('BillingController', () => {
     expect(controller).toBeDefined();
   });
 
-  // TODO #1: this is an example of a unit test
-  /*
-  describe('findOne', () => {
-    it('should return correct response', async () => {
-      const episodeId = 'id';
-      const result = await controller.findOne(episodeId);
-      expect(result).toEqual({ id: 'id' });
+  describe('getBilling', () => {
+    it('should return billing record', async () => {
+      const query: QueryBillingDto = {
+        productCode: 4000,
+        location: 'Malaysia',
+        page: 1,
+        limit: 1,
+      };
+
+      const mockData = [
+        {
+          id: 'uuid',
+          email: 'testing@gmail.com',
+          firstName: 'test',
+          lastName: 'ting',
+          productCode: 4000,
+          location: 'Malaysia',
+          premiumPaid: 100,
+        },
+      ];
+      const mockMeta = { total: 1, page: 1, limit: 1, totalPages: 1 };
+      const mockResult = { data: mockData, meta: mockMeta };
+      mockBillingService.getBilling.mockResolvedValue(mockResult);
+
+      const result = await controller.getBilling(query);
+      expect(result).toBe(mockResult);
+      expect(mockBillingService.getBilling).toHaveBeenCalledWith(query);
+    });
+
+    it('should throw NotFoundException when no records found', async () => {
+      const query: QueryBillingDto = {};
+      mockBillingService.getBilling.mockRejectedValue(
+        new NotFoundException('Premium paid not found'),
+      );
+
+      await expect(controller.getBilling(query)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
-  */
 
-  // TODO #2: this is an example of a unit test if you use the mock function
-  /*describe('findOne', () => {
-    const episodeId = 'id';
-    const mockResult = { id: episodeId, name: 'my episode' };
+  describe('createBilling', () => {
+    it('should create billing record', async () => {
+      const input: CreateBillingDto = {
+        email: 'test@gmail.com',
+        firstName: 'test',
+        lastName: 'testing',
+        productCode: 4000,
+        location: 'Malaysia',
+        premiumPaid: 100,
+      };
+      const mockResult = { id: 'uuid' };
+      mockBillingService.createBilling.mockResolvedValue(mockResult);
 
-    // test if the controller handler returns the mocked result
-    beforeEach(() => {
-      mockFindOne.mockResolvedValue(mockResult);
+      const result = await controller.createBilling(input);
+      expect(result).toBe(mockResult);
+      expect(mockBillingService.createBilling).toHaveBeenCalledWith(input);
+    });
+  });
+
+  describe('editBilling', () => {
+    it('should update billing record', async () => {
+      const input: UpdateBillingDto = {
+        id: 'uuid',
+        location: 'East Malaysia',
+        premiumPaid: 200,
+      };
+      const productCode = 4000;
+
+      const mockResult = { id: 'uuid' };
+      mockBillingService.updateBilling.mockResolvedValue(mockResult);
+
+      const result = await controller.updateBilling(productCode, input);
+      expect(result).toBe(mockResult);
+      expect(mockBillingService.updateBilling).toHaveBeenCalledWith(
+        input,
+        productCode,
+      );
     });
 
-    // test if the controller calls the service with the correct values
-    it('should call the service with correct params', () => {
-      await controller.findOne(episodeId);
-      expect(mockFindOne).toHaveBeenCalledWith(episodeId);
-    });
+    it('should throw NotFoundException if no record is updated', async () => {
+      const input: UpdateBillingDto = {
+        id: 'uuid',
+        location: 'Singapore',
+        premiumPaid: 200,
+      };
 
-    it('should return correct response', async () => {
-      const result = await controller.findOne(episodeId);
+      mockBillingService.updateBilling.mockRejectedValue(
+        new NotFoundException('No billing record found to update'),
+      );
+      await expect(controller.updateBilling(4000, input)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('deleteBilling', () => {
+    it('should delete billing record', async () => {
+      const input: DeleteBillingDto = {
+        id: 'uuid',
+        productCode: 4000,
+      };
+      const mockResult = { id: 'uuid' };
+      mockBillingService.deleteBilling.mockResolvedValue(mockResult);
+
+      const result = await controller.deleteBilling(input);
       expect(result).toEqual(mockResult);
-    });
-  });*/
-
-  // TODO #3: you can put everything in another describe method that tests for positive
-  // scenario, then another describe for negative scenario i.e.:
-  /*describe('findOne', () => {
-    describe('when episode is found', () => {
-      // insert prev code here
+      expect(mockBillingService.deleteBilling).toHaveBeenCalledWith(input);
     });
 
-    describe('when episode is not found', () => {
-      const episodeId = 'id2';
+    it('should throw NotFoundException if no record is deleted', async () => {
+      const input: DeleteBillingDto = {
+        id: 'uuid',
+        productCode: 4000,
+      };
 
-      beforeEach(() => {
-        mockFindOne.mockResolvedValue(null);
-      });
-
-      it('should throw an error', async () => {
-        await expect(controller.findOne(episodeId)).rejects.toThrow(
-          'Episode not found',
-        );
-      });
+      mockBillingService.deleteBilling.mockRejectedValue(
+        new NotFoundException('No billing record found to delete'),
+      );
+      await expect(controller.deleteBilling(input)).rejects.toThrow(
+        NotFoundException,
+      );
     });
-  });*/
+  });
 });

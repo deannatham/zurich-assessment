@@ -11,9 +11,9 @@ import {
 import { BillingService } from './billing.service';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
-  ApiHeader,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -30,6 +30,7 @@ import { Role } from './enums/role.enum';
 import { DeleteBillingDto } from './dto/delete-billing.dto';
 
 @ApiTags('Billing')
+@ApiBearerAuth('jwt-auth')
 @Controller('billing')
 @UseGuards(RoleGuard)
 export class BillingController {
@@ -50,11 +51,6 @@ export class BillingController {
   })
   @ApiForbiddenResponse({ description: 'Missing role permission' })
   @ApiNotFoundResponse({ description: 'Premium paid not found' })
-  @ApiHeader({
-    name: 'x-user-role',
-    description: 'User role for authorization',
-    required: true,
-  })
   async getBilling(@Query() input: QueryBillingDto) {
     return await this.billingService.getBilling(input);
   }
@@ -72,11 +68,6 @@ export class BillingController {
     type: ValidationErrorResponse,
   })
   @ApiForbiddenResponse({ description: 'Not allowed' })
-  @ApiHeader({
-    name: 'x-user-role',
-    description: 'User role for authorization',
-    required: true,
-  })
   @RequireRole(Role.ADMIN)
   async createBilling(
     @Body()
@@ -99,13 +90,8 @@ export class BillingController {
     type: ValidationErrorResponse,
   })
   @ApiForbiddenResponse({ description: 'Not allowed' })
-  @ApiHeader({
-    name: 'x-user-role',
-    description: 'User role for authorization',
-    required: true,
-  })
   @RequireRole(Role.ADMIN)
-  async editBilling(
+  async updateBilling(
     @Query('productCode') productCode: number,
     @Body() input: UpdateBillingDto,
   ) {
@@ -126,11 +112,6 @@ export class BillingController {
     type: ValidationErrorResponse,
   })
   @ApiForbiddenResponse({ description: 'Not allowed' })
-  @ApiHeader({
-    name: 'x-user-role',
-    description: 'User role for authorization',
-    required: true,
-  })
   @RequireRole(Role.ADMIN)
   async deleteBilling(@Query() input: DeleteBillingDto) {
     return await this.billingService.deleteBilling(input);
